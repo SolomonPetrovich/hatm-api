@@ -1,0 +1,122 @@
+{
+    "1": {
+        "startPage": 1,
+        "endPage": 21
+    },
+    "2": {
+        "startPage": 22,
+        "endPage": 41
+    },
+    "3": {
+        "startPage": 42,
+        "endPage": 61
+    },
+    "4": {
+        "startPage": 62,
+        "endPage": 81
+    },
+    "5": {
+        "startPage": 82,
+        "endPage": 101
+    },
+    "6": {
+        "startPage": 102,
+        "endPage": 121
+    },
+    "7": {
+        "startPage": 121,
+        "endPage": 141
+    },
+    "8": {
+        "startPage": 142,
+        "endPage": 161
+    },
+    "9": {
+        "startPage": 162,
+        "endPage": 181
+    },
+    "10": {
+        "startPage": 182,
+        "endPage": 201
+    },
+    "11": {
+        "startPage": 201,
+        "endPage": 221
+    },
+    "12": {
+        "startPage": 222,
+        "endPage": 241
+    },
+    "13": {
+        "startPage": 242,
+        "endPage": 261
+    },
+    "14": {
+        "startPage": 262,
+        "endPage": 281
+    },
+    "15": {
+        "startPage": 282,
+        "endPage": 301
+    },
+    "16": {
+        "startPage": 302,
+        "endPage": 321
+    },
+    "17": {
+        "startPage": 322,
+        "endPage": 341
+    },
+    "18": {
+        "startPage": 342,
+        "endPage": 361
+    },
+    "19": {
+        "startPage": 362,
+        "endPage": 381
+    },
+    "20": {
+        "startPage": 382,
+        "endPage": 401
+    },
+    "21": {
+        "startPage": 402,
+        "endPage": 421
+    },
+    "22": {
+        "startPage": 422,
+        "endPage": 441
+    },
+    "23": {
+        "startPage": 442,
+        "endPage": 461
+    },
+    "24": {
+        "startPage": 462,
+        "endPage": 481
+    },
+    "25": {
+        "startPage": 482,
+        "endPage": 501
+    },
+    "26": {
+        "startPage": 502,
+        "endPage": 521
+    },
+    "27": {
+        "startPage": 522,
+        "endPage": 541
+    },
+    "28": {
+        "startPage": 542,
+        "endPage": 561
+    },
+    "29": {
+        "startPage": 562,
+        "endPage": 581
+    },
+    "30": {
+        "startPage": 582,
+        "endPage": 604
+    }
+}
