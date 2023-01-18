@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
-import config
-
+from .config import SECRET_KEY as secret_key
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.SECRET_KEY
+SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['185.111.106.196', 'kk-api.abmco.kz', 'localhost']
 
 
 # Application definition
@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'hatim',
     'user_auth',
-    'drf_yasg'
+    'drf_yasg',
+    'whitenoise.runserver_nostatic'
 ]
 
 MIDDLEWARE = [
@@ -55,9 +56,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = 'Khatm_Open_API.urls'
+
+STATIC_ROOT = os.path.join(BASE_DIR / 'static')
+STATIC_URL = 'static/'
 
 TEMPLATES = [
     {
@@ -85,8 +90,8 @@ DATABASES = {
     'default':{
         'ENGINE':'django.db.backends.postgresql_psycopg2',
         'NAME':'hatim',
-        'USER':'postgres',
-        'PASSWORD':'0000',
+        'USER':'admin',
+        'PASSWORD':'Passw0rd',
         'HOST':'localhost',
         'POST':'5432',
         'ATOMATIC_REQUESTS':True,
@@ -127,8 +132,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -150,3 +153,4 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
+
