@@ -32,14 +32,15 @@ class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     nickname = models.CharField(max_length=150)
-    hatims_created = models.IntegerField(default=0)
+    active_hatims = models.PositiveIntegerField(default=0)
+    hatims_created = models.PositiveIntegerField(default=0)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nickname']
 
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return self.nickname
 
     class Meta:
         verbose_name = 'User'

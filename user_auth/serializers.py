@@ -9,7 +9,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'nickname', 'juz_set')
+        fields = ('email', 'nickname', 'juz_set', 'hatims_created', 'active_hatims')
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -45,5 +45,5 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             nickname=validated_data['nickname'],
             password=hashed_password
         )
-    
-        return user        
+        
+        return user

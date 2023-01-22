@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
-from .config import SECRET_KEY as secret_key
+from Khatm_Open_API import config
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret_key
+SECRET_KEY = config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config.DEBUG
 
-ALLOWED_HOSTS = ['185.111.106.196', 'kk-api.abmco.kz', 'localhost']
+ALLOWED_HOSTS = ['185.111.106.196', 'kk-api.abmco.kz', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -44,8 +44,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'hatim',
     'user_auth',
+    #swagger
     'drf_yasg',
-    'whitenoise.runserver_nostatic'
+    #load static files in production
+    'whitenoise.runserver_nostatic',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -90,8 +93,8 @@ DATABASES = {
     'default':{
         'ENGINE':'django.db.backends.postgresql_psycopg2',
         'NAME':'hatim',
-        'USER':'admin',
-        'PASSWORD':'Passw0rd',
+        'USER': config.DB_USER,
+        'PASSWORD': config.DB_PASSWORD,
         'HOST':'localhost',
         'POST':'5432',
         'ATOMATIC_REQUESTS':True,
@@ -154,3 +157,6 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
 
+CRONJOBS = [
+    
+]
