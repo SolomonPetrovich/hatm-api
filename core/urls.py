@@ -14,14 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include
 from  .yasg import urlpatterns as doc_urls
-from Khatm_Open_API import settings
-from django.conf.urls.static import serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include('hatim.urls')),
-    path("api/auth/", include('user_auth.urls')),
+    path("api/users/", include('user_auth.urls')),
+    # path('api-auth/', include('rest_framework.urls')),
+    path('api/auth/', include('drf_social_oauth2.urls',namespace='drf')),
 ]
 urlpatterns += doc_urls

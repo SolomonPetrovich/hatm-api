@@ -17,7 +17,8 @@ schema_view = get_schema_view(  # new
     ),
     patterns=[
         path("api/", include('hatim.urls')),
-        path("api/auth/", include('user_auth.urls')),
+        path("api/users/", include('user_auth.urls')),
+        path("api/auth/", include('drf_social_oauth2.urls', namespace='drf'))
         ],
     public=True,
     permission_classes=(permissions.AllowAny,),

@@ -47,3 +47,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         
         return user
+
+
+class InputSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+    nickname = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('email', 'nickname')
+    

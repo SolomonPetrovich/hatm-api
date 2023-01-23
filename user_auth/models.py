@@ -4,14 +4,13 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password, **extra_fields):
+    def create_user(self, email, **extra_fields):
         if not email:
             raise ValueError('Email is required')
-        if not password:
-            raise ValueError('Password is required')
+        # if not nickname:
+        #     raise ValueError('Nickname is required')
 
-        user = self.model(email=self.normalize_email(email), **extra_fields)
-        user.set_password(password)
+        user = self.model(email=self.normalize_email(email),  **extra_fields)
         user.save(using=self._db)
         return user
 
@@ -40,7 +39,7 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.nickname
+        return self.email
 
     class Meta:
         verbose_name = 'User'
