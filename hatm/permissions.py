@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 
-class HatimCountPermission(permissions.BasePermission):
+class HatmCountPermission(permissions.BasePermission):
     message = 'User exceeded object limit'
     
     def has_permission(self, request, view):

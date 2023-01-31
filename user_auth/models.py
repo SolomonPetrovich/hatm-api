@@ -1,46 +1,63 @@
+from django.contrib.auth.models import (
+    AbstractBaseUser, BaseUserManager, PermissionsMixin)
+
 from django.db import models
-from django.contrib.auth.models import *
-from phonenumber_field.modelfields import PhoneNumberField
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
-class CustomUserManager(BaseUserManager):
-    def create_user(self, email, **extra_fields):
-        if not email:
-            raise ValueError('Email is required')
-        # if not nickname:
-        #     raise ValueError('Nickname is required')
+class UserManager(BaseUserManager):
 
-        user = self.model(email=self.normalize_email(email),  **extra_fields)
-        user.save(using=self._db)
+    def create_user(self, email):
+        if email is None:
+            raise TypeError('Users should have a Email')
+
+        user = self.model(email=self.normalize_email(email))
+        user.save()
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
+    def create_superuser(self, email,  password=None):
+        if password is None:
+            raise TypeError('Password should not be none')
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
+        user = self.create_user(email)
+        user.set_password(password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+        return user
 
-        return self.create_user(email, password, **extra_fields)
+
+AUTH_PROVIDERS = {'google': 'google', 'apple': 'apple'}
 
 
-class CustomUser(AbstractUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = None
     email = models.EmailField(unique=True)
-    nickname = models.CharField(max_length=150)
-    active_hatims = models.PositiveIntegerField(default=0)
-    hatims_created = models.PositiveIntegerField(default=0)
+    is_verified = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    nickname = models.CharField(max_length=150, default=None, null=True)
+    active_hatms = models.PositiveIntegerField(default=0)
+    hatms_created = models.PositiveIntegerField(default=0)
+    auth_provider = models.CharField(max_length=150)
+
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nickname']
+    REQUIRED_FIELDS = []
 
-    objects = CustomUserManager()
-
-    def __str__(self):
-        return self.email
+    objects = UserManager()
 
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
+
+    def __str__(self):
+        return self.email
+
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }

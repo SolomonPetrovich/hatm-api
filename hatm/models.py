@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 from user_auth.models import CustomUser as User
@@ -7,7 +6,7 @@ from django.db.models.signals import post_save
 import datetime
 
 
-class Hatim(models.Model):
+class Hatm(models.Model):
     creator_id = models.ForeignKey(User, on_delete=models.CASCADE)
     isPublic = models.BooleanField(default=True)
     title = models.CharField(max_length=150)
@@ -17,8 +16,8 @@ class Hatim(models.Model):
     deadline = models.DateField()
 
     class Meta:
-        verbose_name = ("Hatim")
-        verbose_name_plural = ("Hatims")
+        verbose_name = ("Hatm")
+        verbose_name_plural = ("Hatms")
 
     def __str__(self):
         return self.title
@@ -35,7 +34,7 @@ class Juz(models.Model):
         ('juz', 'Juz'),
         ('dua', 'Dua')
     )
-    hatim_id = models.ForeignKey(Hatim, on_delete=models.CASCADE, related_name='juz')
+    hatm_id = models.ForeignKey(Hatm, on_delete=models.CASCADE, related_name='juz')
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='juz_set')
     juz_number = models.PositiveIntegerField(blank=False, validators=[MinValueValidator(1), MaxValueValidator(31)])
     type = models.CharField(choices=entityType, max_length=50)
@@ -47,23 +46,23 @@ class Juz(models.Model):
 
     def __str__(self):
         if self.type == 'juz':
-            return str(self.hatim_id.creator_id) + '`s Hatim, Juz = ' + str(self.juz_number)
+            return str(self.hatm_id.creator_id) + '`s Hatm, Juz = ' + str(self.juz_number)
         else:
-            return str(self.hatim_id.creator_id) + '`s Hatim, Dua'
+            return str(self.hatm_id.creator_id) + '`s Hatm, Dua'
 
 
 def create_children(sender, instance, created, **kwargs):
     if created:
         for i in range(30):
             Juz.objects.create(
-                hatim_id=instance, 
+                hatm_id=instance, 
                 juz_number=i+1,
                 type='juz'
             )
         Juz.objects.create(
-            hatim_id=instance,
+            hatm_id=instance,
             juz_number=31,
             type='dua'
         )
 
-post_save.connect(create_children, sender=Hatim)
+post_save.connect(create_children, sender=Hatm)

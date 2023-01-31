@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from core import config
 import os
-from oauth2_provider import settings as oauth2_settings
+import datetime
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,17 +44,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    'hatim',
+    'hatm',
     'user_auth',
     #swagger
     'drf_yasg',
     #load static files in production
     'whitenoise.runserver_nostatic',
     'corsheaders',
-    #auth
-    'oauth2_provider',
-    'social_django',
-    'drf_social_oauth2',
 ]
 
 MIDDLEWARE = [
@@ -75,7 +72,7 @@ STATIC_URL = 'static/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -147,37 +144,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user_auth.CustomUser'
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'drf_social_oauth2.authentication.SocialAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-}
-
-
 AUTHENTICATION_BACKENDS = (
-    # Google OAuth2
-    'social_core.backends.google.GoogleOAuth2',
-    #Apple OAuth2
-    'social_core.backends.apple.AppleIdAuth'
-    # django-rest-framework-social-oauth2
-    'drf_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
 
-# Google configuration
+# Google OAuth2
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
 
-SOCIAL_AUTH_USER_FIELDS = ['email', 'first_name', 'last_name']
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
-# expires in 6 months
-oauth2_settings.DEFAULTS['ACCESS_TOKEN_EXPIRE_SECONDS'] = 1.577e7
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(hours=5),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+}

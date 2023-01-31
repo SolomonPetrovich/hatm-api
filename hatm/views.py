@@ -7,18 +7,18 @@ from .permissions import *
 from user_auth.models import CustomUser as User
 
 
-class HatimViewSet(generics.ListAPIView):
-    queryset = Hatim.objects.all()
-    serializer_class = HatimSerializer
+class HatmViewSet(generics.ListAPIView):
+    queryset = Hatm.objects.all()
+    serializer_class = HatmSerializer
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        return Hatim.objects.filter(isCompleted=False)
+        return Hatm.objects.filter(isCompleted=False)
 
 
-class HatimRetrieveView(generics.RetrieveAPIView):
-    queryset = Hatim.objects.all()
-    serializer_class = SingleHatimSerializer
+class HatmRetrieveView(generics.RetrieveAPIView):
+    queryset = Hatm.objects.all()
+    serializer_class = SingleHatmSerializer
     permission_classes = (IsAuthenticated, )
 
     def get_serializer_context(self):
@@ -27,7 +27,7 @@ class HatimRetrieveView(generics.RetrieveAPIView):
         return context
 
     def get(self, request, pk, format=None):
-        queryset = Hatim.objects.get(pk=pk)
+        queryset = Hatm.objects.get(pk=pk)
         serializer = self.serializer_class(queryset, context={'request':self.get_serializer_context()})
         return Response(serializer.data)
 
@@ -49,7 +49,7 @@ class JuzTakeView(generics.GenericAPIView):
     def patch(self, request, pk, format=None):
         juz = self.get_object()
         if juz.type == 'dua':
-            if isAllCompleted(juz.hatim_id):
+            if isAllCompleted(juz.hatm_id):
                 juz.status = 'in Progress'
                 juz.user_id = request.user
                 juz.save()
@@ -100,16 +100,16 @@ class JuzFinishView(generics.GenericAPIView):
             serializer = self.get_serializer(juz)
 
             if juz.type == 'dua':
-                hatim = Hatim.objects.get(pk=juz.hatim_id.id)
-                hatim.isCompleted = True
-                hatim.save()
+                hatm = Hatm.objects.get(pk=juz.hatm_id.id)
+                hatm.isCompleted = True
+                hatm.save()
 
-                if hatim.isPublic == True:
-                    #create new public hatim when one of them completed
-                    create_public_hatim(hatim.creator_id)
+                if hatm.isPublic == True:
+                    #create new public hatm when one of them completed
+                    create_public_hatm(hatm.creator_id)
                 else:
-                    user = User.objects.get(pk=hatim.creator_id.id)
-                    user.active_hatims -= 1
+                    user = User.objects.get(pk=hatm.creator_id.id)
+                    user.active_hatms -= 1
                     user.save()
 
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -118,14 +118,14 @@ class JuzFinishView(generics.GenericAPIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
-def create_public_hatim(user):
-    hatim_deadine = datetime.date.today() + datetime.timedelta(days=30)
-    hatim = Hatim.objects.create(creator_id=user, isCompleted=False, isPublic=True, title='hatim.io', description='ARO', deadline=hatim_deadine)
-    hatim.save()
+def create_public_hatm(user):
+    hatm_deadine = datetime.date.today() + datetime.timedelta(days=30)
+    hatm = Hatm.objects.create(creator_id=user, isCompleted=False, isPublic=True, title='hatm.io', description='ARO', deadline=hatm_deadine)
+    hatm.save()
 
 
-def isAllCompleted(hatim_id):
-    juzs = Juz.objects.filter(hatim_id=hatim_id, type='juz')
+def isAllCompleted(hatm_id):
+    juzs = Juz.objects.filter(hatm_id=hatm_id, type='juz')
     for juz in juzs:
         if juz.status != 'completed':
             return False

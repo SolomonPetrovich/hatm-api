@@ -3,5 +3,6 @@ from .views import *
 
 
 urlpatterns = [
-    path("me/", UserRetrieveAPIView.as_view(), name=""),
+    path("users/me/", UserRetriveUpdateView.as_view()),
+    path('login/google/', GoogleSocialAuthView.as_view()),
 ]

@@ -8,7 +8,7 @@ from rest_framework import permissions
 
 schema_view = get_schema_view(  # new
     openapi.Info(
-        title="Khatm Open API",
+        title="Hatm Open API",
         default_version='v1',
         description="Test description",
         terms_of_service="https://www.google.com/policies/terms/",
@@ -16,9 +16,8 @@ schema_view = get_schema_view(  # new
         license=openapi.License(name="BSD License"),
     ),
     patterns=[
-        path("api/", include('hatim.urls')),
-        path("api/users/", include('user_auth.urls')),
-        path("api/auth/", include('drf_social_oauth2.urls', namespace='drf'))
+        path("api/", include('hatm.urls')),
+        path("api/auth/", include('user_auth.urls')),
         ],
     public=True,
     permission_classes=(permissions.AllowAny,),
