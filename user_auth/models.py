@@ -2,7 +2,7 @@ from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
 
 from django.db import models
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 
 class UserManager(BaseUserManager):
@@ -57,7 +57,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def tokens(self):
         refresh = RefreshToken.for_user(self)
+        access = AccessToken.for_user(self)
         return {
             'refresh': str(refresh),
-            'access': str(refresh.access_token)
+            'access': str(access),
+            'acces_expires_in': str(access.lifetime.total_seconds()),
+            'refresh_expires_in': str(refresh.lifetime.total_seconds())
         }

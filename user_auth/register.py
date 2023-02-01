@@ -27,5 +27,4 @@ def register_social_user(provider, email):
 
         
         new_user = User.objects.get(email=email)
-        
         return new_user.tokens()        
