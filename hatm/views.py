@@ -1,3 +1,4 @@
+from random import random
 from rest_framework.views import Response
 from rest_framework import generics, status
 from rest_framework.permissions import *
@@ -119,8 +120,23 @@ class JuzFinishView(generics.GenericAPIView):
 
 
 def create_public_hatm(user):
+    title_vars = [
+        {
+            'title': 'hatm.io',
+            'description': 'ARO'
+        },
+        {
+            'title': 'hatm.io',
+            'description': 'ARO'
+        },
+        {
+            'title': 'hatm.io',
+            'description': 'ARO'
+        }
+    ]
+    title_var = random.choice(title_vars)
     hatm_deadine = datetime.date.today() + datetime.timedelta(days=30)
-    hatm = Hatm.objects.create(creator_id=user, isCompleted=False, isPublic=True, title='hatm.io', description='ARO', deadline=hatm_deadine)
+    hatm = Hatm.objects.create(creator_id=user, isCompleted=False, isPublic=True, isPublished=True, title=title_var['title'], description=title_var['description'], deadline=hatm_deadine)
     hatm.save()
 
 

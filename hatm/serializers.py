@@ -20,13 +20,6 @@ class SingleHatmSerializer(serializers.HyperlinkedModelSerializer):
         model = Hatm
         fields = ('id', 'creator_id','isCompleted', 'isPublic', 'title', 'description', 'deadline', 'juz')
 
-    def create(self, validated_data):
-        user = self.context['request'].user
-        user.hatms_created = user.hatms_created + 1
-        user.active_hatms = user.active_hatms + 1
-        user.save()
-        return super().create(validated_data)
-
 
 class HatmSerializer(serializers.ModelSerializer):
     

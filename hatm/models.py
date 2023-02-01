@@ -8,10 +8,11 @@ import datetime
 
 class Hatm(models.Model):
     creator_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    isPublic = models.BooleanField(default=True)
     title = models.CharField(max_length=150)
     description = models.TextField()
+    isPublic = models.BooleanField(default=True)
     isCompleted = models.BooleanField(default=False)
+    isPublished = models.BooleanField(default=False)
     created_at = models.DateField(default=datetime.date.today)
     deadline = models.DateField()
 
@@ -64,5 +65,10 @@ def create_children(sender, instance, created, **kwargs):
             juz_number=31,
             type='dua'
         )
+
+        user = User.objects.get(id=instance.creator_id.id)
+        user.hatms_created = user.hatms_created + 1
+        user.active_hatms = user.active_hatms + 1
+        user.save()
 
 post_save.connect(create_children, sender=Hatm)
