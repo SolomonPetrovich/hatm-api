@@ -8,13 +8,30 @@ from .permissions import *
 from user_auth.models import CustomUser as User
 
 
-class HatmViewSet(generics.ListAPIView):
+class HatmViewSet(generics.GenericAPIView):
     queryset = Hatm.objects.all()
     serializer_class = HatmSerializer
     permission_classes = (IsAuthenticated, )
 
-    def get_queryset(self):
-        return Hatm.objects.filter(isCompleted=False)
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
+    
+    def get(self, request, format=None):
+        queryset = Hatm.objects.filter(isCompleted=False, isPublished=True)
+        serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
+        return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data, context={'request':self.get_serializer_context()})
+        if serializer.is_valid():
+            is_public = serializer.validated_data['isPublic']
+            print(is_public)
+            serializer.save(creator_id=request.user, isPublished=not is_public)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 class HatmRetrieveView(generics.RetrieveAPIView):

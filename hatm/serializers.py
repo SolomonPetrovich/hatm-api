@@ -18,11 +18,16 @@ class SingleHatmSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Hatm
-        fields = ('id', 'creator_id','isCompleted', 'isPublic', 'title', 'description', 'deadline', 'juz')
+        fields = ('id', 'creator_id', 'isPublic', 'title', 'description', 'deadline', 'juz')
 
 
 class HatmSerializer(serializers.ModelSerializer):
-    
+    creator_id = serializers.ReadOnlyField(source='creator_id.id')
+    isPublic = serializers.BooleanField(required=True)
+    title = serializers.CharField(max_length=100)
+    description = serializers.CharField(max_length=500)
+    deadline = serializers.DateField()
+
     class Meta:
         model = Hatm
         fields = ('id', 'creator_id', 'isPublic', 'title', 'description', 'deadline')
