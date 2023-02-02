@@ -50,6 +50,15 @@ class HatmRetrieveView(generics.RetrieveAPIView):
         return Response(serializer.data)
 
 
+class JuzViewSet(generics.ListAPIView):
+    serializer_class = JuzSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        hatm_id = self.kwargs['pk']
+        return Juz.objects.filter(hatm_id=hatm_id)
+
+
 class JuzMineViewSet(generics.ListAPIView):
     serializer_class = JuzSerializer
     permission_classes = (IsAuthenticated, )
