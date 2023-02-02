@@ -4,8 +4,8 @@ from user_auth.models import CustomUser as User
 
 
 class JuzSerializer(serializers.ModelSerializer):
-    hatm_id = serializers.ReadOnlyField(source='hatm_id.id')
-    juz_number = serializers.ReadOnlyField()
+    hatm_id = serializers.IntegerField(read_only=True , source='hatm_id.id')
+    juz_number = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = Juz
