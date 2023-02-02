@@ -19,7 +19,7 @@ class HatmViewSet(generics.GenericAPIView):
         return context
     
     def get(self, request, format=None):
-        queryset = Hatm.objects.filter(isCompleted=False, isPublished=True)
+        queryset = Hatm.objects.filter(isCompleted=False, isPublic=True, isPublished=True)
         serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
         return Response(serializer.data)
     
@@ -36,7 +36,7 @@ class HatmViewSet(generics.GenericAPIView):
 
 class HatmRetrieveView(generics.RetrieveAPIView):
     queryset = Hatm.objects.all()
-    serializer_class = SingleHatmSerializer
+    serializer_class = HatmSerializer
     permission_classes = (IsAuthenticated, )
 
     def get_serializer_context(self):
@@ -121,8 +121,9 @@ class JuzFinishView(generics.GenericAPIView):
                 hatm = Hatm.objects.get(pk=juz.hatm_id.id)
                 hatm.isCompleted = True
                 hatm.save()
-
-                if hatm.isPublic == True:
+                
+                overLimited = isOverLimited()
+                if hatm.isPublic == True and not overLimited:
                     #create new public hatm when one of them completed
                     create_public_hatm(hatm.creator_id)
                 else:
@@ -163,3 +164,11 @@ def isAllCompleted(hatm_id):
         if juz.status != 'completed':
             return False
     return True
+
+
+def isOverLimited():
+    hatms = Hatm.objects.filter(isPublic=True)
+    if len(hatms) >= 3:
+        return True
+    else:
+        return False

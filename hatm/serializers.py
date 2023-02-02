@@ -12,16 +12,8 @@ class JuzSerializer(serializers.ModelSerializer):
         fields = ('id', 'hatm_id', 'user_id', 'juz_number', 'status', 'type')
 
 
-class SingleHatmSerializer(serializers.HyperlinkedModelSerializer):
+class HatmSerializer(serializers.HyperlinkedModelSerializer):
     juz = JuzSerializer(many=True, read_only=True)
-    creator_id = serializers.ReadOnlyField(source='creator_id.id')
-    
-    class Meta:
-        model = Hatm
-        fields = ('id', 'creator_id', 'isPublic', 'title', 'description', 'deadline', 'juz')
-
-
-class HatmSerializer(serializers.ModelSerializer):
     creator_id = serializers.ReadOnlyField(source='creator_id.id')
     isPublic = serializers.BooleanField(required=True)
     title = serializers.CharField(max_length=100)
@@ -30,4 +22,4 @@ class HatmSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hatm
-        fields = ('id', 'creator_id', 'isPublic', 'title', 'description', 'deadline')
+        fields = ('id', 'creator_id', 'isPublic', 'title', 'description', 'deadline', 'juz')

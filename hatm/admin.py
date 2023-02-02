@@ -17,6 +17,7 @@ class HatmAdmin(admin.ModelAdmin):
 class JusAdmin(admin.ModelAdmin):
     list_display = ['hatm_id', 'user_id', 'juz_number', 'status', 'type']
     list_filter = ['status', 'type', 'hatm_id']
+    list_editable = ['status']
     list_per_page = 31
 
 
