@@ -3,7 +3,7 @@ from .models import CustomUser
 # Register your models here.
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['email', 'nickname', 'hatms_created' , 'active_hatms', 'auth_provider', 'created_at']
+    list_display = ['email', 'nickname', 'hatms_created' , 'active_hatms', 'created_at']
 
 
 admin.site.register(CustomUser, UserAdmin)

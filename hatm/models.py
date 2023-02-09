@@ -10,9 +10,9 @@ class Hatm(models.Model):
     creator_id = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     description = models.TextField()
-    isPublic = models.BooleanField()
-    isCompleted = models.BooleanField(default=False)
-    isPublished = models.BooleanField(default=False)
+    is_public = models.BooleanField()
+    is_completed = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=False)
     created_at = models.DateField(default=datetime.date.today)
     deadline = models.DateField()
 

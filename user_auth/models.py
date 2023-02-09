@@ -1,8 +1,6 @@
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
-
 from django.db import models
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 
 class UserManager(BaseUserManager):
@@ -27,9 +25,6 @@ class UserManager(BaseUserManager):
         return user
 
 
-AUTH_PROVIDERS = {'google': 'google', 'apple': 'apple'}
-
-
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = None
     email = models.EmailField(unique=True)
@@ -41,7 +36,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     nickname = models.CharField(max_length=150, default=None, null=True)
     active_hatms = models.PositiveIntegerField(default=0)
     hatms_created = models.PositiveIntegerField(default=0)
-    auth_provider = models.CharField(max_length=150)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -54,13 +48,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-
-    def tokens(self):
-        refresh = RefreshToken.for_user(self)
-        access = AccessToken.for_user(self)
-        return {
-            'refresh': str(refresh),
-            'access': str(access),
-            'acces_expires_in': str(access.lifetime.total_seconds()),
-            'refresh_expires_in': str(refresh.lifetime.total_seconds())
-        }
