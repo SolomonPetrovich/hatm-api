@@ -36,7 +36,7 @@ class Juz(models.Model):
         ('dua', 'Dua')
     )
     hatm_id = models.ForeignKey(Hatm, on_delete=models.CASCADE, related_name='juz')
-    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='juz_set')
+    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='juz_set')
     juz_number = models.PositiveIntegerField(blank=False, validators=[MinValueValidator(1), MaxValueValidator(31)])
     type = models.CharField(choices=entityType, max_length=50)
     status = models.CharField(choices=juzStatus, default='free', max_length=20)
@@ -65,10 +65,5 @@ def create_children(sender, instance, created, **kwargs):
             juz_number=31,
             type='dua'
         )
-
-        user = User.objects.get(id=instance.creator_id.id)
-        user.hatms_created = user.hatms_created + 1
-        user.active_hatms = user.active_hatms + 1
-        user.save()
 
 post_save.connect(create_children, sender=Hatm)

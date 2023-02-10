@@ -1,4 +1,4 @@
-from random import random
+import random
 from rest_framework.views import Response
 from rest_framework import generics, status
 from rest_framework.permissions import *
@@ -19,16 +19,16 @@ class HatmViewSet(generics.GenericAPIView):
         return context
     
     def get(self, request, format=None):
-        queryset = Hatm.objects.filter(isCompleted=False, isPublic=True, isPublished=True)
+        queryset = Hatm.objects.filter(is_completed=False, is_public=True, is_published=True)
         serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
         return Response(serializer.data)
     
     def post(self, request, format=None):
         serializer = self.serializer_class(data=request.data, context={'request':self.get_serializer_context()})
         if serializer.is_valid():
-            is_public = serializer.validated_data['isPublic']
+            is_public = serializer.validated_data['is_public']
             print(is_public)
-            serializer.save(creator_id=request.user, isPublished=not is_public)
+            serializer.save(creator_id=request.user, is_published=not is_public)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -75,16 +75,6 @@ class JuzTakeView(generics.GenericAPIView):
     
     def patch(self, request, pk, format=None):
         juz = self.get_object()
-        if juz.type == 'dua':
-            if isAllCompleted(juz.hatm_id):
-                juz.status = 'in Progress'
-                juz.user_id = request.user
-                juz.save()
-                serializer = self.get_serializer(juz)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                data = {'message':'All Juz are not completed'}
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
         if juz.status == 'free':
             juz.status = 'in Progress'
             juz.user_id = request.user
@@ -121,26 +111,33 @@ class JuzFinishView(generics.GenericAPIView):
 
     def patch(self, request, pk, format=None):
         juz = self.get_object()
-        if juz.user_id == request.user:
-            juz.status = 'completed'
-            juz.save()
-            serializer = self.get_serializer(juz)
+        serializer = self.get_serializer(juz)
 
+        if juz.user_id == request.user:
+            
             if juz.type == 'dua':
-                hatm = Hatm.objects.get(pk=juz.hatm_id.id)
-                hatm.isCompleted = True
-                hatm.save()
-                
-                overLimited = isOverLimited()
-                if hatm.isPublic == True and not overLimited:
-                    #create new public hatm when one of them completed
-                    create_public_hatm(hatm.creator_id)
+                if is_all_completed(juz.hatm_id):
+                    
+                    juz.status = 'completed'
+                    juz.save()
+                    
+                    hatm = Hatm.objects.get(pk=juz.hatm_id.id)
+                    hatm.is_completed = True
+                    hatm.save()
+                    
+                    overLimited = is_over_limited()
+                    
+                    if hatm.is_public == True:
+                        if not overLimited:
+                            create_public_hatm(hatm.creator_id)
+
+                    return Response(serializer.data, status=status.HTTP_200_OK)
                 else:
-                    user = User.objects.get(pk=hatm.creator_id.id)
-                    user.active_hatms -= 1
-                    user.save()
+                    data = {'message':'All Juz are not completed'}
+                    return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
+        
         else:
             data = {'message':'You are not the owner of this juz'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
@@ -163,11 +160,11 @@ def create_public_hatm(user):
     ]
     title_var = random.choice(title_vars)
     hatm_deadine = datetime.date.today() + datetime.timedelta(days=30)
-    hatm = Hatm.objects.create(creator_id=user, isCompleted=False, isPublic=True, isPublished=True, title=title_var['title'], description=title_var['description'], deadline=hatm_deadine)
+    hatm = Hatm.objects.create(creator_id=user, is_completed=False, is_public=True, is_published=True, title=title_var['title'], description=title_var['description'], deadline=hatm_deadine)
     hatm.save()
 
 
-def isAllCompleted(hatm_id):
+def is_all_completed(hatm_id):
     juzs = Juz.objects.filter(hatm_id=hatm_id, type='juz')
     for juz in juzs:
         if juz.status != 'completed':
@@ -175,8 +172,8 @@ def isAllCompleted(hatm_id):
     return True
 
 
-def isOverLimited():
-    hatms = Hatm.objects.filter(isPublic=True)
+def is_over_limited():
+    hatms = Hatm.objects.filter(is_public=True, is_published=True, is_completed=False)
     if len(hatms) >= 3:
         return True
     else:

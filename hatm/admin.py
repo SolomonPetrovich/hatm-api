@@ -5,9 +5,9 @@ from .models import Hatm, Juz
 
 class HatmAdmin(admin.ModelAdmin):
     search_fields = ("title__startswith", "description__startswith")
-    list_display = ['creator_id', 'title', 'description', 'is_published', 'is_public', 'is_completed', 'deadline']
+    list_display = ['id', 'creator_id', 'title', 'description', 'is_published', 'is_public', 'is_completed', 'deadline']
     list_filter = ['is_public', 'is_completed','is_published', 'deadline']
-    list_editable = ['title', 'description', 'is_published']
+    list_editable = ['creator_id', 'title', 'description', 'is_published']
     list_per_page = 10
 
     formfield_overrides = {

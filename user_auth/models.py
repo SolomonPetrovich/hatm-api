@@ -34,8 +34,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     nickname = models.CharField(max_length=150, default=None, null=True)
-    active_hatms = models.PositiveIntegerField(default=0)
-    hatms_created = models.PositiveIntegerField(default=0)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
