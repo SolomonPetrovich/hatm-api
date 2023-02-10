@@ -135,6 +135,9 @@ class JuzFinishView(generics.GenericAPIView):
                 else:
                     data = {'message':'All Juz are not completed'}
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                juz.status = 'completed'
+                juz.save()
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         
