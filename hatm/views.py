@@ -93,9 +93,8 @@ class JuzTakeView(generics.GenericAPIView):
                 else:
                     taken_juzs.append(juz.juz_number)
             
-            if len(taken_juzs) > 0:
-                data = {'already_taken':taken_juzs, 'succesfully_taken':succesfully}
-                return Response(data, status=status.HTTP_200_OK)
+            data = {'already_taken':taken_juzs, 'succesfully_taken':succesfully}
+            return Response(data, status=status.HTTP_200_OK)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
