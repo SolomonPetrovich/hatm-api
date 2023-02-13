@@ -6,7 +6,7 @@ from .models import Hatm, Juz
 class HatmAdmin(admin.ModelAdmin):
     search_fields = ("title__startswith", "description__startswith")
     list_display = ['id', 'creator_id', 'title', 'description', 'is_published', 'is_public', 'is_completed', 'deadline']
-    list_filter = ['is_public', 'is_completed','is_published', 'deadline']
+    list_filter = ['is_public', 'is_completed','is_published']
     list_editable = ['creator_id', 'title', 'description', 'is_published']
     list_per_page = 10
 
@@ -14,12 +14,12 @@ class HatmAdmin(admin.ModelAdmin):
         models.TextField: {'widget': Textarea(attrs={'rows':4, 'cols':40})},
     }
 
-class JusAdmin(admin.ModelAdmin):
-    list_display = ['hatm_id', 'user_id', 'juz_number', 'status', 'type']
+class JuzAdmin(admin.ModelAdmin):
+    list_display = ['hatm_id', 'user_id', 'juz_number', 'status', 'type', 'deadline']
     list_filter = ['status', 'type', 'hatm_id']
     list_editable = ['status']
     list_per_page = 31
 
 
 admin.site.register(Hatm, HatmAdmin)
-admin.site.register(Juz, JusAdmin)
+admin.site.register(Juz, JuzAdmin)

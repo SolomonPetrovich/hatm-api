@@ -1,11 +1,13 @@
 import random
-from rest_framework.views import Response
+from django.forms import ValidationError
+
 from rest_framework import generics, status
 from rest_framework.permissions import *
+from rest_framework.views import Response
+
 from .models import *
-from .serializers import *
 from .permissions import *
-from user_auth.models import CustomUser as User
+from .serializers import *
 
 
 class HatmViewSet(generics.GenericAPIView):
@@ -27,7 +29,6 @@ class HatmViewSet(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data, context={'request':self.get_serializer_context()})
         if serializer.is_valid():
             is_public = serializer.validated_data['is_public']
-            print(is_public)
             serializer.save(creator_id=request.user, is_published=not is_public)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -47,7 +48,7 @@ class HatmRetrieveView(generics.RetrieveAPIView):
     def get(self, request, pk, format=None):
         queryset = Hatm.objects.get(pk=pk)
         serializer = self.serializer_class(queryset, context={'request':self.get_serializer_context()})
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class JuzViewSet(generics.ListAPIView):
@@ -56,7 +57,7 @@ class JuzViewSet(generics.ListAPIView):
 
     def get_queryset(self):
         hatm_id = self.kwargs['pk']
-        return Juz.objects.filter(hatm_id=hatm_id)
+        return Juz.objects.filter(hatm_id=hatm_id, status='free')
 
 
 class JuzMineViewSet(generics.ListAPIView):
@@ -69,21 +70,34 @@ class JuzMineViewSet(generics.ListAPIView):
 
 
 class JuzTakeView(generics.GenericAPIView):
-    queryset = Juz.objects.all()
-    serializer_class = JuzSerializer
+    serializer_class = JuzTakeSerializer
     permission_classes = (IsAuthenticated, )
-    
-    def patch(self, request, pk, format=None):
-        juz = self.get_object()
-        if juz.status == 'free':
-            juz.status = 'in Progress'
-            juz.user_id = request.user
-            juz.save()
-            serializer = self.get_serializer(juz)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            data = {'message':'Juz is already taken or finished'}
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_queryset(self):
+        return Juz.objects.filter(pk__in=self.request.data['ids'])
+
+    def patch(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            days = serializer.validated_data['days']
+            queryset = self.get_queryset()
+            taken_juzs = []
+            succesfully = []
+            for juz in queryset:
+                if juz.status == 'free':
+                    juz.status = 'in Progress'
+                    juz.user_id = request.user
+                    juz.deadline = datetime.datetime.now() + datetime.timedelta(days=days)
+                    juz.save()
+                    succesfully.append(juz.juz_number)
+                else:
+                    taken_juzs.append(juz.juz_number)
+            
+            if len(taken_juzs) > 0:
+                data = {'already_taken':taken_juzs, 'succesfully_taken':succesfully}
+                return Response(data, status=status.HTTP_200_OK)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class JuzCancelView(generics.GenericAPIView):
@@ -96,6 +110,7 @@ class JuzCancelView(generics.GenericAPIView):
         if juz.user_id == request.user:
             juz.status = 'free'
             juz.user_id = None
+            juz.deadline = None
             juz.save()
             serializer = self.get_serializer(juz)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -133,7 +148,7 @@ class JuzFinishView(generics.GenericAPIView):
 
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 else:
-                    data = {'message':'All Juz are not completed'}
+                    data = {'message':'All Juzs are not completed'}
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
             else:
                 juz.status = 'completed'

@@ -14,7 +14,7 @@ class Hatm(models.Model):
     is_completed = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
     created_at = models.DateField(default=datetime.date.today)
-    deadline = models.DateField()
+    deadline = models.DateTimeField(null=True)
 
     class Meta:
         verbose_name = ("Hatm")
@@ -40,6 +40,7 @@ class Juz(models.Model):
     juz_number = models.PositiveIntegerField(blank=False, validators=[MinValueValidator(1), MaxValueValidator(31)])
     type = models.CharField(choices=entityType, max_length=50)
     status = models.CharField(choices=juzStatus, default='free', max_length=20)
+    deadline = models.DateTimeField(null=True)
 
     class Meta:
         verbose_name = ("Juz")
