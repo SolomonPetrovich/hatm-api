@@ -52,10 +52,13 @@ INSTALLED_APPS = [
     #load static files in production
     'whitenoise.runserver_nostatic',
     'corsheaders',
-
+    #social auth
     'oauth2_provider',
     'social_django',
     'drf_social_oauth2',
+
+    #cron jobs
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -191,3 +194,9 @@ OAUTH2_PROVIDER = {
 }
 
 APPEND_SLASH = False
+
+
+CRONJOBS = [
+    ('*/1 * * * *', 'hatm.crons.take_juz_from_user'),
+    ('0 0 * * *', 'hatm.crons.extend_the_deadline_of_hatm')
+]
