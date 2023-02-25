@@ -19,7 +19,7 @@ class HatmViewSet(generics.GenericAPIView):
         context = super().get_serializer_context()
         context.update({'request': self.request})
         return context
-    
+
     def get(self, request, format=None):
         queryset = Hatm.objects.filter(is_completed=False, is_public=True, is_published=True)
         serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
