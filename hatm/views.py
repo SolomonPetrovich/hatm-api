@@ -92,8 +92,7 @@ class JuzTakeView(generics.GenericAPIView):
                     succesfully.append(juz.juz_number)
                 else:
                     taken_juzs.append(juz.juz_number)
-            
-            data = {'already_taken':taken_juzs, 'succesfully_taken':succesfully}
+            data = {'already_taken':taken_juzs, 'succesfully_taken':succesfully, 'deadline': datetime.datetime.now() + datetime.timedelta(days=days)}
             return Response(data, status=status.HTTP_200_OK)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
