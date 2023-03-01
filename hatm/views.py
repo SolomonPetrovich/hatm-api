@@ -23,7 +23,7 @@ class HatmViewSet(generics.GenericAPIView):
         return context
 
     @swagger_auto_schema(
-        operation_description="Get all public, not completed, published hatms",
+        operation_description='Get all public, not completed, published hatms',
         responses={200: HatmSerializer(many=True)},
     )
     def get(self, request, format=None):
@@ -32,7 +32,7 @@ class HatmViewSet(generics.GenericAPIView):
         return Response(serializer.data)
     
     @swagger_auto_schema(
-        operation_description="Create a new hatm",
+        operation_description='Create a new hatm',
         request_body=HatmSerializer,
         responses={201: HatmSerializer},
     )
@@ -57,7 +57,7 @@ class HatmRetrieveView(generics.RetrieveAPIView):
         return context
 
     @swagger_auto_schema(
-        operation_description="Get a specific hatm",
+        operation_description='Get a specific hatm',
         responses={200: HatmSerializer},
     )
     def get(self, request, pk, format=None):
@@ -76,7 +76,7 @@ class HatmMineViewSet(generics.ListAPIView):
         return Hatm.objects.filter(juz__user_id=user)
     
     @swagger_auto_schema(
-        operation_description="Get a list of hatm that are taken by the user",
+        operation_description='Get a list of hatm with juzs that are taken by the user',
         responses={200: HatmSerializer(many=True)},
     )
     def get(self, request, *args, **kwargs):
@@ -103,10 +103,10 @@ class JuzViewSet(generics.ListAPIView):
         return Juz.objects.filter(hatm_id=hatm_id, status='free')
     
     @swagger_auto_schema(
-        operation_description="Get a list of free juz in a hatm",
+        operation_description='Get a list of free juz in a hatm',
         responses={200: JuzSerializer(many=True)},
         manual_parameters=[
-            openapi.Parameter('id', openapi.IN_PATH, description="Hatm id", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('id', openapi.IN_PATH, description='Hatm id', type=openapi.TYPE_INTEGER),
         ]
     )
     def get(self, request, *args, **kwargs):
@@ -122,7 +122,7 @@ class JuzMineViewSet(generics.ListAPIView):
         return Juz.objects.filter(user_id=user)
     
     @swagger_auto_schema(
-        operation_description="Get a list of juz that are taken by the user",
+        operation_description='Get a list of juz that are taken by the user',
         responses={200: JuzSerializer(many=True)},
     )
     def get(self, request, *args, **kwargs):
@@ -147,7 +147,7 @@ class JuzTakeView(generics.GenericAPIView):
             )
         },
         request_body=JuzTakeSerializer,
-        operation_description="Take a list of juz for a number of days"
+        operation_description='Take a list of juz for a number of days'
     )
     def patch(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
@@ -170,7 +170,7 @@ class JuzTakeView(generics.GenericAPIView):
 
             if len(succesfully) < 0:
                 deadline = None
-            data = {'already_taken': taken_juzs, 'succesfully_taken': succesfully, 'deadline': deadline.strftime(format="%Y-%m-%d %H:%M:%S")}
+            data = {'already_taken': taken_juzs, 'succesfully_taken': succesfully, 'deadline': deadline.strftime(format='%Y-%m-%d %H:%M:%S')}
             return Response(data, status=status.HTTP_200_OK)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -190,10 +190,10 @@ class JuzCancelView(generics.GenericAPIView):
         )
     },
     manual_parameters=[
-        openapi.Parameter('id', openapi.IN_PATH, description="Juz id", type=openapi.TYPE_INTEGER), 
+        openapi.Parameter('id', openapi.IN_PATH, description='Juz id', type=openapi.TYPE_INTEGER), 
     ],
-    operation_description="This view takes a list of juz ids and cancels them. It returns a list of juz numbers that were already cancelled and a list of juz numbers that were succesfully cancelled.",
-    operation_id="juz_cancel",
+    operation_description='This view takes a list of juz ids and cancels them. It returns a list of juz numbers that were already cancelled and a list of juz numbers that were succesfully cancelled.',
+    operation_id='juz_cancel',
     )
     def patch(self, request, pk, format=None):
         juz = self.get_object()
@@ -223,10 +223,10 @@ class JuzFinishView(generics.GenericAPIView):
         )
         },
         manual_parameters=[
-            openapi.Parameter('id', openapi.IN_PATH, description="Juz id", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('id', openapi.IN_PATH, description='Juz id', type=openapi.TYPE_INTEGER),
         ],
-        operation_description="This view takes a list of juz ids and finishes them. It returns a list of juz numbers that were already finished and a list of juz numbers that were succesfully finished.",
-        operation_id="juz_finish",
+        operation_description='This view takes a list of juz ids and finishes them. It returns a list of juz numbers that were already finished and a list of juz numbers that were succesfully finished.',
+        operation_id='juz_finish',
     )
     def patch(self, request, pk, format=None):
         juz = self.get_object()
