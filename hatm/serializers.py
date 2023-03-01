@@ -8,11 +8,12 @@ class JuzSerializer(serializers.ModelSerializer):
     juz_number = serializers.IntegerField(read_only=True)
     type = serializers.CharField(read_only=True)
     status = serializers.CharField(read_only=True)
-    deadline = serializers.DateTimeField(read_only=True)
-    
+    deadline = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M:%S")
+    user_id = serializers.IntegerField(read_only=True, source='user_id.id')
+
     class Meta:
         model = Juz
-        fields = ('id', 'hatm_id',  'juz_number', 'status', 'type', 'deadline')
+        fields = ('id', 'hatm_id',  'juz_number', 'status', 'type', 'deadline', 'user_id')
 
 
 class JuzTakeSerializer(serializers.Serializer):
