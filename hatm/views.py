@@ -168,7 +168,14 @@ class JuzTakeView(generics.GenericAPIView):
                     else:
                         taken_juzs.append(juz.juz_number)
                 else:
-                    unseccesfully.append(juz.juz_number)
+                    if is_all_completed(juz.hatm_id):
+                        juz.status = 'in Progress'
+                        juz.user_id = request.user
+                        juz.deadline = datetime.datetime.now() + datetime.timedelta(days=days)
+                        juz.save()
+                        succesfully.append(juz.juz_number)
+                    else:
+                        unseccesfully.append(juz.juz_number)
                 deadline = datetime.datetime.now() + datetime.timedelta(days=days)
 
             if len(succesfully) < 0:
