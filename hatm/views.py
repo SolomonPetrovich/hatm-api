@@ -156,6 +156,7 @@ class JuzTakeView(generics.GenericAPIView):
             queryset = self.get_queryset()
             taken_juzs = []
             succesfully = []
+            unseccesfully = []
             for juz in queryset:
                 if juz.type == 'juz':
                     if juz.status == 'free':
@@ -166,11 +167,13 @@ class JuzTakeView(generics.GenericAPIView):
                         succesfully.append(juz.juz_number)
                     else:
                         taken_juzs.append(juz.juz_number)
+                else:
+                    unseccesfully.append(juz.juz_number)
                 deadline = datetime.datetime.now() + datetime.timedelta(days=days)
 
             if len(succesfully) < 0:
                 deadline = None
-            data = {'already_taken': taken_juzs, 'succesfully_taken': succesfully, 'deadline': deadline.strftime(format='%Y-%m-%d %H:%M:%S')}
+            data = {'already_taken': taken_juzs, 'succesfully_taken': succesfully, 'unsuccesfully_taken':unseccesfully, 'deadline': deadline.strftime(format='%Y-%m-%d %H:%M:%S')}
             return Response(data, status=status.HTTP_200_OK)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
