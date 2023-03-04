@@ -67,30 +67,30 @@ class HatmRetrieveView(generics.RetrieveAPIView):
 
 
 class HatmMineViewSet(generics.ListAPIView):
-    '''Get list of hatm with specific juzs that taken by user'''
     serializer_class = HatmSerializer
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         user = self.request.user
-        return Hatm.objects.filter(juz__user_id=user)
+        return Hatm.objects.all()
     
     @swagger_auto_schema(
-        operation_description='Get a list of hatm with juzs that are taken by the user',
+        operation_description='Get list of hatm with specific juzs that taken by user',
         responses={200: HatmSerializer(many=True)},
     )
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        print(queryset)
         serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
-        data = serializer.data
-        for hatm in data:
+        #filter juzs by user_id if its exists
+        data = []
+        print(serializer.data)
+        for hatm in serializer.data:
+            print('jere')
             juzs = hatm['juz']
-            updated_juzs = []
-            for juz in juzs:
-                if 'user_id' in juz:
-                    if juz['user_id'] == self.request.user.id:
-                        updated_juzs.append(juz)
-            hatm['juz'] = updated_juzs
+            juzs = [juz for juz in juzs if 'user_id' in juz and juz['user_id'] == self.request.user.id]
+            hatm['juz'] = juzs
+            data.append(hatm)
         return Response(data, status=status.HTTP_200_OK)
     
 
