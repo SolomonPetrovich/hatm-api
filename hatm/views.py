@@ -80,16 +80,15 @@ class HatmMineViewSet(generics.ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        print(queryset)
         serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
         #filter juzs by user_id if its exists
         data = []
-        print(serializer.data)
         for hatm in serializer.data:
-            print('jere')
             juzs = hatm['juz']
             juzs = [juz for juz in juzs if 'user_id' in juz and juz['user_id'] == self.request.user.id]
             hatm['juz'] = juzs
+            if len(hatm['juz']) < 1:
+                return Response({'message': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
             data.append(hatm)
         return Response(data, status=status.HTTP_200_OK)
     
@@ -142,6 +141,7 @@ class JuzTakeView(generics.GenericAPIView):
             properties={
                 'already_taken': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER)),
                 'succesfully_taken': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER)),
+                'unseccesfully_taken': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER)),
                 'deadline': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME),
                 }
             )
@@ -153,6 +153,7 @@ class JuzTakeView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             days = serializer.validated_data['days']
+            deadline = datetime.datetime.now() + datetime.timedelta(days=days)
             queryset = self.get_queryset()
             taken_juzs = []
             succesfully = []
@@ -162,7 +163,7 @@ class JuzTakeView(generics.GenericAPIView):
                     if juz.status == 'free':
                         juz.status = 'in Progress'
                         juz.user_id = request.user
-                        juz.deadline = datetime.datetime.now() + datetime.timedelta(days=days)
+                        juz.deadline = deadline
                         juz.save()
                         succesfully.append(juz.juz_number)
                     else:
@@ -171,16 +172,14 @@ class JuzTakeView(generics.GenericAPIView):
                     if is_all_completed(juz.hatm_id):
                         juz.status = 'in Progress'
                         juz.user_id = request.user
-                        juz.deadline = datetime.datetime.now() + datetime.timedelta(days=days)
+                        juz.deadline = deadline
                         juz.save()
                         succesfully.append(juz.juz_number)
                     else:
                         unseccesfully.append(juz.juz_number)
-                deadline = datetime.datetime.now() + datetime.timedelta(days=days)
-
-            if len(succesfully) < 0:
-                deadline = None
-            data = {'already_taken': taken_juzs, 'succesfully_taken': succesfully, 'unsuccesfully_taken':unseccesfully, 'deadline': deadline.strftime(format='%Y-%m-%d %H:%M:%S')}
+            deadline = deadline.strftime(format='%Y-%m-%d %H:%M:%S')
+                
+            data = {'already_taken': taken_juzs, 'succesfully_taken': succesfully, 'unsuccesfully_taken':unseccesfully, 'deadline': deadline}
             return Response(data, status=status.HTTP_200_OK)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
