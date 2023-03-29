@@ -198,7 +198,7 @@ APPEND_SLASH = False
 CRONJOBS = [
     ('*/1 * * * *', 'hatm.crons.take_juz_from_user'),
     ('0 0 * * *', 'hatm.crons.extend_the_deadline_of_hatm'),
-    ('30 14 * * *', 'hatm.delete_expired_refresh_tokens')
+    ('50 14 * * *', 'hatm.delete_expired_refresh_tokens')
 ]
 
 CORS_ALLOW_METHODS = [
