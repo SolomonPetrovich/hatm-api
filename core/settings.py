@@ -28,7 +28,7 @@ SECRET_KEY = config.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.DEBUG
 
-ALLOWED_HOSTS = ['185.111.106.196', 'kk-api.abmco.kz', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['185.111.106.196', 'kk-api.abmco.kz', 'localhost', '127.0.0.1', 'hatm-api.devhouse.kz', '86.107.44.198']
 
 
 # Application definition
