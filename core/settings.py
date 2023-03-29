@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from core import config
 import os
-import datetime
-import oauth2_provider.settings
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -189,7 +187,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 OAUTH2_PROVIDER = {
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 10,
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
     'OAUTH_SINGLE_ACCESS_TOKEN': True,
     'OAUTH_DELETE_EXPIRED': True
 }
@@ -199,7 +197,8 @@ APPEND_SLASH = False
 
 CRONJOBS = [
     ('*/1 * * * *', 'hatm.crons.take_juz_from_user'),
-    ('0 0 * * *', 'hatm.crons.extend_the_deadline_of_hatm')
+    ('0 0 * * *', 'hatm.crons.extend_the_deadline_of_hatm'),
+    ('30 14 * * *', 'hatm.delete_expired_refresh_tokens')
 ]
 
 CORS_ALLOW_METHODS = [

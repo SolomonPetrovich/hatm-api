@@ -177,7 +177,7 @@ class JuzTakeView(generics.GenericAPIView):
                         succesfully.append(juz.juz_number)
                     else:
                         unseccesfully.append(juz.juz_number)
-            deadline = deadline.strftime(format='%Y-%m-%d %H:%M:%S')
+            deadline = deadline.strftime(format='%Y-%m-%d %H:%M:%Sw')
                 
             data = {'already_taken': taken_juzs, 'succesfully_taken': succesfully, 'unsuccesfully_taken':unseccesfully, 'deadline': deadline}
             return Response(data, status=status.HTTP_200_OK)
