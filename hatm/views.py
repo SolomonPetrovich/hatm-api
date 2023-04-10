@@ -27,7 +27,6 @@ class HatmViewSet(generics.GenericAPIView):
         responses={200: HatmSerializer(many=True)},
     )
     def get(self, request, format=None):
-        '''Get list of hatms with all they juz's and statistics how many was finished and how many in proggress and how many not taken'''
         queryset = Hatm.objects.filter(is_completed=False, is_public=True, is_published=True)
         serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
         return Response(serializer.data, status=status.HTTP_200_OK)
