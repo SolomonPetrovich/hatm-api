@@ -35,11 +35,11 @@ class HatmSerializer(serializers.HyperlinkedModelSerializer):
         model = Hatm
         fields = ('id','is_public', 'title', 'description', 'deadline','completed', 'in_progress', 'free', 'juz')
 
-    def get_completed(self, obj):
+    def get_completed(self, obj) -> int:
         return obj.juz.filter(status='completed').count()
         
-    def get_free(self, obj):
+    def get_free(self, obj) -> int:
         return obj.juz.filter(status='free').count()
     
-    def get_in_progress(self, obj):
+    def get_in_progress(self, obj) -> int:
         return obj.juz.filter(status='in Progress').count()
