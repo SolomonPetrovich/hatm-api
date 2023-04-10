@@ -27,7 +27,19 @@ class HatmSerializer(serializers.HyperlinkedModelSerializer):
     title = serializers.CharField(max_length=100)
     description = serializers.CharField(max_length=500)
     deadline = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    completed = serializers.SerializerMethodField()
+    in_progress = serializers.SerializerMethodField()
+    free = serializers.SerializerMethodField()
 
     class Meta:
         model = Hatm
-        fields = ('id','is_public', 'title', 'description', 'deadline', 'juz')
+        fields = ('id','is_public', 'title', 'description', 'deadline','completed', 'in_progress', 'free', 'juz')
+
+    def get_completed(self, obj):
+        return obj.juz.filter(status='completed').count()
+        
+    def get_free(self, obj):
+        return obj.juz.filter(status='free').count()
+    
+    def get_in_progress(self, obj):
+        return obj.juz.filter(status='in Progress').count()
