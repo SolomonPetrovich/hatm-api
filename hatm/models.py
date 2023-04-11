@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
@@ -7,6 +8,7 @@ import datetime
 
 
 class Hatm(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     creator_id = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     description = models.TextField()
@@ -35,6 +37,7 @@ class Juz(models.Model):
         ('juz', 'Juz'),
         ('dua', 'Dua')
     )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     hatm_id = models.ForeignKey(Hatm, on_delete=models.CASCADE, related_name='juz')
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='juz_set')
     juz_number = models.PositiveIntegerField(blank=False, validators=[MinValueValidator(1), MaxValueValidator(31)])
