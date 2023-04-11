@@ -85,7 +85,7 @@ class HatmMineViewSet(generics.ListAPIView):
         data = []
         for hatm in serializer.data:
             juzs = hatm['juz']
-            juzs = [juz for juz in juzs if 'user_id' in juz and juz['user_id'] == self.request.user.id]
+            juzs = [juz for juz in juzs if 'user_id' in juz and juz['user_id'] == str(self.request.user.id)]
             hatm['juz'] = juzs
             if len(hatm['juz']) < 1:
                 return Response({'message': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -206,7 +206,7 @@ class JuzCancelView(generics.GenericAPIView):
     )
     def patch(self, request, pk, format=None):
         juz = self.get_object()
-        if juz.user_id == request.user:
+        if str(juz.user_id) == str(request.user):
             juz.status = 'free'
             juz.user_id = None
             juz.deadline = None
@@ -241,7 +241,7 @@ class JuzFinishView(generics.GenericAPIView):
         juz = self.get_object()
         serializer = self.get_serializer(juz)
 
-        if juz.user_id == request.user:
+        if str(juz.user_id) == str(request.user):
             
             if juz.type == 'dua':
                 if is_all_completed(juz.hatm_id):
