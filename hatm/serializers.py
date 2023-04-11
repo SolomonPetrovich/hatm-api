@@ -17,7 +17,7 @@ class JuzSerializer(serializers.ModelSerializer):
 
 
 class JuzTakeSerializer(serializers.Serializer):
-    ids = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    ids = serializers.ListField(child=serializers.UUIDField(), write_only=True)
     days = serializers.IntegerField(write_only=True)
 
 
