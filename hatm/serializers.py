@@ -4,12 +4,12 @@ from .models import Juz, Hatm
 
 
 class JuzSerializer(serializers.ModelSerializer):
-    hatm_id = serializers.IntegerField(read_only=True , source='hatm_id.id')
+    hatm_id = serializers.CharField(read_only=True , source='hatm_id.id')
     juz_number = serializers.IntegerField(read_only=True)
     type = serializers.CharField(read_only=True)
     status = serializers.CharField(read_only=True)
     deadline = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M:%S")
-    user_id = serializers.IntegerField(read_only=True, source='user_id.id')
+    user_id = serializers.CharField(read_only=True, source='user_id.id')
 
     class Meta:
         model = Juz
