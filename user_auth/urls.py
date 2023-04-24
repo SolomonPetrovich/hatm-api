@@ -5,5 +5,5 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    path("users/me/", UserRetriveUpdateView.as_view()),
+    path("users/me/", UserRetrieveUpdateDestroyAPIView.as_view()),
 ]

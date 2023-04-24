@@ -6,7 +6,7 @@ from .permissions import *
 from rest_framework.response import Response
 
 
-class UserRetriveUpdateView(generics.RetrieveUpdateAPIView):
+class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated, IsOwnerOnly,)
     serializer_class = UserSerializer
     queryset = User.objects.all()
