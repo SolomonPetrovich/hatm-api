@@ -93,6 +93,16 @@ class HatmMineViewSet(generics.ListAPIView):
         return Response(data, status=status.HTTP_200_OK)
     
 
+class HatmCreatedViewSet(generics.ListAPIView):
+    serializer_class = HatmSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, format=None):
+        queryset = Hatm.objects.filter(creator_id=str(request.user.id))
+        serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
+        return Response(serializer.data, status.HTTP_200_OK)
+    
+
 class JuzViewSet(generics.ListAPIView):
     serializer_class = JuzSerializer
     permission_classes = (IsAuthenticated, )
