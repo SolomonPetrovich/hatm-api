@@ -20,7 +20,7 @@ from drf_social_oauth2 import urls
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('bastyq/', admin.site.urls),
     path("api/", include('hatm.urls')),
     path("api/", include('user_auth.urls')),
     re_path(r'api/auth/', include('drf_social_oauth2.urls', namespace='drf'))
