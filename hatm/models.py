@@ -1,9 +1,10 @@
 import uuid
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 from user_auth.models import CustomUser as User
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 import datetime
 
 
@@ -17,6 +18,7 @@ class Hatm(models.Model):
     is_published = models.BooleanField(default=False)
     created_at = models.DateField(default=datetime.date.today)
     deadline = models.DateTimeField(null=True)
+    members = models.ManyToManyField(User, related_name='members', blank=True, null=True)
 
     class Meta:
         verbose_name = ("Hatm")
@@ -56,6 +58,12 @@ class Juz(models.Model):
             return str(self.hatm_id.creator_id) + '`s Hatm, Dua'
 
 
+def add_creator_to_members(sender, instance, created, **kwargs):
+    if created:
+        instance.members.add(instance.creator_id)
+        instance.save()
+
+
 def create_children(sender, instance, created, **kwargs):
     if created:
         for i in range(30):
@@ -70,4 +78,25 @@ def create_children(sender, instance, created, **kwargs):
             type='dua'
         )
 
+
+post_save.connect(add_creator_to_members, sender=Hatm)
 post_save.connect(create_children, sender=Hatm)
+
+
+
+class JoinRequest(models.Model):
+    statusTypes = [
+        ('rejected', 'Rejected'),
+        ('approved', 'Approved'),
+        ('pending', 'Pending')
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    hatm = models.ForeignKey(Hatm, on_delete=models.CASCADE, related_name='join_requests')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, choices=statusTypes, default='pending')
+
+
+    def __str__(self) -> str:
+        return f'User: {self.user}, Hatm: {self.hatm}'

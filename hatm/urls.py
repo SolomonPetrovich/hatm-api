@@ -14,4 +14,9 @@ urlpatterns = [
     path('juzs/take/', JuzTakeView.as_view()),
     path('juzs/cancel/<uuid:pk>/', JuzCancelView.as_view()),
     path('juzs/finish/<uuid:pk>/', JuzFinishView.as_view()),
+
+    #join request
+    path('request/join/', JoinRequestView.as_view()),
+    path('request/pending/', PendingRequest.as_view()),
+    path("request/<uuid:pk>/", ApproveRejectRequestView.as_view())
 ]

@@ -1,6 +1,6 @@
 import datetime
 from rest_framework import serializers
-from .models import Juz, Hatm
+from .models import *
 
 
 class JuzSerializer(serializers.ModelSerializer):
@@ -30,10 +30,11 @@ class HatmSerializer(serializers.HyperlinkedModelSerializer):
     completed = serializers.SerializerMethodField()
     in_progress = serializers.SerializerMethodField()
     free = serializers.SerializerMethodField()
+    members = serializers.SerializerMethodField()
 
     class Meta:
         model = Hatm
-        fields = ('id','is_public', 'title', 'description', 'deadline','completed', 'in_progress', 'free', 'juz')
+        fields = ('id','is_public', 'title', 'description', 'deadline','completed', 'in_progress', 'free', 'members', 'juz')
 
     def get_completed(self, obj) -> int:
         return obj.juz.filter(status='completed').count()
@@ -43,3 +44,36 @@ class HatmSerializer(serializers.HyperlinkedModelSerializer):
     
     def get_in_progress(self, obj) -> int:
         return obj.juz.filter(status='in Progress').count()
+    
+    def get_members(self, obj) -> list:
+        return [user.id for user in obj.members.all()]
+
+
+class JoinHatmRequestSerializer(serializers.ModelSerializer):
+    hatm = serializers.CharField()
+    class Meta:
+        model = JoinRequest
+        fields = ['hatm']
+
+
+class PendingRequestsSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True)
+    hatm = serializers.UUIDField(read_only=True)
+    user = serializers.UUIDField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    class Meta:
+        model = JoinRequest
+        fields = ['id', 'hatm', 'user', 'created_at', 'status']
+
+
+class RequestsSerializer(serializers.ModelSerializer):
+    statusTypes = [
+        ('rejected', 'Rejected'),
+        ('approved', 'Approved')
+    ]
+    status = serializers.ChoiceField(choices=statusTypes)
+    
+    class Meta:
+        model = JoinRequest
+        fields = ['status']

@@ -3,25 +3,16 @@ import datetime
 from .models import Hatm, Juz
 
 
-def create_public_hatm(user):
-    title_vars = [
-        {
-            'title': 'hatm.io',
-            'description': 'ARO'
-        },
-        {
-            'title': 'hatm.io',
-            'description': 'ARO'
-        },
-        {
-            'title': 'hatm.io',
-            'description': 'ARO'
-        }
-    ]
-    title_var = random.choice(title_vars)
-    hatm_deadine = datetime.date.today() + datetime.timedelta(days=30)
-    hatm = Hatm.objects.create(creator_id=user, is_completed=False, is_public=True, is_published=True, title=title_var['title'], description=title_var['description'], deadline=hatm_deadine)
-    hatm.save()
+def create_or_publish_public_hatm(user):
+    #get not published public hatms sorted by creation date
+    hatms = Hatm.objects.filter(is_public=True, is_published=False).order_by('created_at')
+    if len(hatms) > 0:
+        hatm = hatms[0]
+        hatm.is_published = True
+        hatm.save()
+    else:
+        hatm = Hatm.objects.create(user=user, is_public=True, is_published=True)
+    return hatm
 
 
 def is_all_completed(hatm_id):

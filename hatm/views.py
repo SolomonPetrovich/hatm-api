@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework import generics, status
 from rest_framework.permissions import *
 from rest_framework.views import Response
@@ -27,7 +29,7 @@ class HatmViewSet(generics.GenericAPIView):
         responses={200: HatmSerializer(many=True)},
     )
     def get(self, request, format=None):
-        queryset = Hatm.objects.filter(is_completed=False, is_public=True, is_published=True)
+        queryset = Hatm.objects.filter(is_completed=False, is_published=True)
         serializer = self.serializer_class(queryset, many=True, context={'request':self.get_serializer_context()})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -267,7 +269,7 @@ class JuzFinishView(generics.GenericAPIView):
                     
                     if hatm.is_public == True:
                         if not overLimited:
-                            create_public_hatm(hatm.creator_id)
+                            create_or_publish_public_hatm(hatm.creator_id)
                     
                     data = {'message':'Juz and Hatm completed succesfully'}
                     return Response(data=data, status=status.HTTP_200_OK)
@@ -284,3 +286,98 @@ class JuzFinishView(generics.GenericAPIView):
         else:
             data = {'message':'You are not the owner of this juz'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+
+class JoinRequestView(generics.GenericAPIView):
+    serializer_class = JoinHatmRequestSerializer
+    queryset = JoinRequest.objects.all()
+
+    def post(self, request):
+        hatm_id = request.data.get('hatm')
+        user_id = request.data.get('user')
+        hatm = Hatm.objects.get(id=hatm_id)
+
+        if request.user in hatm.members.all():
+            return Response({'message': 'You are already a member of this hatm.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if hatm.is_completed:
+            return Response({'message': 'This hatm is completed.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if hatm.is_public:    
+            hatm.members.add(request.user)
+            hatm.save()
+            return Response({'message': 'You joined to this hatm succesfully!'}, status=status.HTTP_200_OK)
+        else:
+            if JoinRequest.objects.filter(hatm=hatm, user=request.user):
+                joinRequest = JoinRequest.objects.get(hatm=hatm, user=request.user)
+                
+                if joinRequest.status == 'pending':
+                    return Response({'message': 'You already sent a request for this hatm.'}, status=status.HTTP_400_BAD_REQUEST)
+                elif joinRequest.status == 'rejected':
+                    joinRequest.status = 'pending'
+                    joinRequest.save()
+                else:
+                    return Response({'message': 'You are already a member of this hatm.'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save(hatm=hatm, user=request.user, status='pending')
+            return Response({'message': 'Your request has been sent succesfully!'}, status=status.HTTP_200_OK)
+        
+
+class PendingRequest(generics.ListAPIView):
+    serializer_class = PendingRequestsSerializer
+
+    #select JoinRequest objects that status=pending and hatm creator id = user.id
+    def get_queryset(self):
+        user = self.request.user
+        return JoinRequest.objects.filter(status='pending', hatm__creator_id=user.id)
+    
+
+class ApproveRejectRequestView(generics.GenericAPIView):
+    serializer_class = RequestsSerializer
+    queryset = JoinRequest.objects.all()
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'status': openapi.Schema(type=openapi.TYPE_STRING),
+                }
+            )
+        },
+        request_body = openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'status': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    enum=['rejected', 'approved'],
+                    description='Status',
+                ),
+            },
+            required=['status'],
+        ),
+        operation_description='This view respondes to request to join hatm.',
+        operation_id='respond_to_request',
+    )
+    def patch(self, request, pk, *args, **kwargs):
+        join_request = self.get_object()
+        serializer = self.get_serializer(join_request, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        
+        hatm = join_request.hatm
+        
+        if hatm.creator_id == request.user:
+            if join_request.status != 'pending':
+                return Response(data={'message': 'You have already responded to this request!'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if serializer.validated_data['status'] == 'approved':
+                hatm.members.add(join_request.user)
+            
+            serializer.save()
+        
+        else:
+            return Response(data={'message': 'You are not owner of this hatm'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
